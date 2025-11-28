@@ -1,48 +1,22 @@
 # Entorno virtual
-env/
+.venv/
 venv/
-ENV/
-*.env
 
-# Archivos de Python
+# Cachés de Python
 __pycache__/
-*.py[cod]
+*.pyc
 *.pyo
 *.pyd
-*.pdb
-*.pkl
-*.pyc
 
 # Archivos temporales
 *.log
-*.pot
-*.so
-*.mo
 
-# Base de datos SQlite (NO subir)
-db.sqlite3
-db.sqlite3-journal
-
-# Archivos de cache y sesiones
-*.cache
-*.sql
-*.sqlite3
-
-# Archivos de compilación
-*.egg-info/
-dist/
-build/
-
-# VSCode
+# Configuraciones de VSCode
 .vscode/
-.settings/
 
-# Archivos del sistema operativo
+# Migraciones si quieres ignorarlas (opcional)
+# */migrations/
+
+# Archivos del sistema
 .DS_Store
 Thumbs.db
-
-# Static *generados por Django* (si usaras collectstatic en producción)
-staticfiles/
-
-# PERMITIR static/ del template
-!static/
