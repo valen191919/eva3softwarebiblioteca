@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<article class="wrapper style1">
+  <div class="container">
+    
+    <!-- Barra superior con nombre y logout -->
+    <div style="background-color: #f5f5f5; padding: 15px; border-radius: 10px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+      <div style="margin-bottom: 10px;">
+        <strong>👤 Bienvenido/a:</strong> 
+        {{ usuario.get_full_name|default:usuario.username }}
+        {% if perfil %}
+          <span style="color: #666; font-size: 0.9em;">({{ perfil.get_rol_display }})</span>
+        {% endif %}
+      </div>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <!-- Botón de Admin solo para administradores -->
+        {% if usuario.is_superuser or usuario.is_staff %}
+          <a href="/admin/" class="button small" target="_blank">⚙️ Panel Admin Django</a>
+        {% endif %}
+        <a href="/logout/" class="button small">🚪 Cerrar Sesión</a>
+      </div>
+    </div>
+
+    <!-- Estadísticas rápidas -->
+    <div class="row aln-center" style="margin-bottom: 30px;">
+      <div class="col-4 col-12-small">
+        <div style="background-color: #e3f2fd; padding: 15px; border-radius: 10px; text-align: center;">
+          <h3 style="margin: 0; color: #1976d2;">{{ total_libros }}</h3>
+          <p style="margin: 5px 0 0 0; color: #555;">Total Libros</p>
+        </div>
+      </div>
+      <div class="col-4 col-12-small">
+        <div style="background-color: #e8f5e9; padding: 15px; border-radius: 10px; text-align: center;">
+          <h3 style="margin: 0; color: #388e3c;">{{ libros_disponibles }}</h3>
+          <p style="margin: 5px 0 0 0; color: #555;">Disponibles</p>
+        </div>
+      </div>
+      <div class="col-4 col-12-small">
+        <div style="background-color: #fff3e0; padding: 15px; border-radius: 10px; text-align: center;">
+          <h3 style="margin: 0; color: #f57c00;">{{ prestamos_activos }}</h3>
+          <p style="margin: 5px 0 0 0; color: #555;">Préstamos Activos</p>
+        </div>
+      </div>
+    </div>
+
+    <header>
+      <h1 style="text-align:center;">¿Qué acción deseas realizar?</h1>
+      <p style="text-align:center;">Selecciona uno de los procesos disponibles del sistema.</p>
+    </header>
+
+    <!-- Opciones para TODOS los usuarios -->
+    <div class="row aln-center" style="margin-top:40px;">
+
+      <div class="col-4 col-6-medium col-12-small">
+        <section class="box style1">
+          <h3>📚 Solicitar un libro</h3>
+          <p>Ver libros disponibles y realizar un préstamo.</p>
+          <a href="/prestamo/" class="button">Ir</a>
+        </section>
+      </div>
+
+      <div class="col-4 col-6-medium col-12-small">
+        <section class="box style1">
+          <h3>📖 Devolver un libro</h3>
+          <p>Registrar la devolución de un libro y ver multas si corresponde.</p>
+          <a href="/devolucion/" class="button">Ir</a>
+        </section>
+      </div>
+
+      <div class="col-4 col-6-medium col-12-small">
+        <section class="box style1">
+          <h3>📊 Disponibilidad de libros</h3>
+          <p>Revisar si existe disponibilidad de libros.</p>
+          <a href="/disponibilidad/" class="button">Ir</a>
+        </section>
+      </div>
+
+    </div>
+
+    <!-- Opciones SOLO para Bibliotecarios y Administradores -->
+    {% if perfil and perfil.rol in 'bibliotecario,administrador' %}
+      <div style="margin-top: 50px; padding-top: 30px; border-top: 2px solid #ddd;">
+        <h2 style="text-align: center; color: #1976d2;">🔧 Panel de Gestión</h2>
+        <p style="text-align: center; color: #666;">Herramientas exclusivas para bibliotecarios</p>
+        
+        <div class="row aln-center" style="margin-top: 30px;">
+          
+          <div class="col-4 col-6-medium col-12-small">
+            <section class="box style1" style="border: 2px solid #1976d2;">
+              <h3>📚 Gestionar Libros</h3>
+              <p>Agregar, editar y eliminar libros del catálogo.</p>
+              <a href="/gestionar-libros/" class="button">Ir</a>
+            </section>
+          </div>
+
+          <div class="col-4 col-6-medium col-12-small">
+            <section class="box style1" style="border: 2px solid #1976d2;">
+              <h3>📈 Ver Estadísticas</h3>
+              <p>Consultar estadísticas detalladas del sistema.</p>
+              <a href="/panel-bibliotecario/" class="button">Ir</a>
+            </section>
+          </div>
+
+        </div>
+      </div>
+    {% endif %}
+
+  </div>
+</article>
+
+{% endblock %}

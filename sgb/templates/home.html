@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<article class="wrapper style1">
+	<div class="container" style="text-align:center; padding-top: 120px; padding-bottom: 120px;">
+		
+		<h1 style="font-size: 3rem; font-weight: 300;">
+			Bienvenido a la Biblioteca Comunitaria MJV
+		</h1>
+
+		<p style="font-size: 1.4rem; margin-top: 10px; color: #777;">
+			Accede para solicitar préstamos, revisar disponibilidad de ejemplares y gestionar tus devoluciones.
+		</p>
+
+		<div style="margin-top: 30px;">
+			<a href="/login/" class="button large">
+				🔑 Iniciar Sesión
+			</a>
+			<a href="/registro/" class="button large alt">
+				📝 Crear Cuenta
+			</a>
+		</div>
+
+	</div>
+</article>
+
+{% endblock %}

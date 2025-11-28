@@ -1,0 +1,8 @@
+createsuperuser
+Nombre de usuario (leave blank to use 'valyn'): superman
+Dirección de correo electrónico: vale@gmail.com
+Password: 1q2w3e
+
+
+bibliotecario1
+CascadA2421

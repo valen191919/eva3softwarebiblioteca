@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<article class="wrapper style1">
+  <div class="container">
+    <header style="text-align:center;">
+      <h1>📖 Devolver Libro</h1>
+      <p>Registra la devolución de tus libros prestados</p>
+    </header>
+
+    <!-- Mensajes de éxito o error -->
+    {% if messages %}
+      <div style="margin: 20px 0;">
+        {% for message in messages %}
+        <div style="padding: 15px; margin-bottom: 10px; border-radius: 5px; background-color: #ffffcc; border: 1px solid #ffcc00;">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if prestamos %}
+      <div style="margin-top: 30px;">
+        <h3 style="text-align: center; margin-bottom: 20px;">Tus Préstamos Activos</h3>
+        
+        {% for prestamo in prestamos %}
+          <div style="border: 2px solid #ddd; padding: 20px; margin-bottom: 20px; border-radius: 10px; background-color: #f9f9f9;">
+            <h4>📚 {{ prestamo.libro.titulo }}</h4>
+            <p><strong>Autor:</strong> {{ prestamo.libro.autor }}</p>
+            <p><strong>Fecha de Préstamo:</strong> {{ prestamo.fecha_prestamo|date:"d/m/Y" }}</p>
+            <p><strong>Fecha de Devolución Esperada:</strong> {{ prestamo.fecha_devolucion_esperada|date:"d/m/Y" }}</p>
+
+
+            <form method="POST" style="margin-top: 15px;">
+              {% csrf_token %}
+              <input type="hidden" name="prestamo_id" value="{{ prestamo.id }}">
+              <button type="submit" class="button">🔄 Devolver este Libro</button>
+            </form>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align: center; margin: 40px 0;">
+        <p style="font-size: 1.2rem; color: #999;">
+          📭 No tienes préstamos activos.
+        </p>
+        <a href="/prestamo/" class="button">Solicitar un Libro</a>
+      </div>
+    {% endif %}
+
+    <div style="text-align: center; margin-top: 30px;">
+      <a href="/dashboard/" class="button alt">🔙 Volver al Dashboard</a>
+    </div>
+
+  </div>
+</article>
+
+{% endblock %}

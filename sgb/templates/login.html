@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container" style="max-width: 400px; margin-top: 50px;">
+    <h2 style="text-align:center;">Iniciar Sesión</h2>
+
+    {% if error %}
+        <p style="color:red; text-align:center;">{{ error }}</p>
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        <label for="username">Usuario:</label>
+        <input type="text" name="username" class="form-control" required>
+
+        <label for="password" style="margin-top:15px;">Contraseña:</label>
+        <input type="password" name="password" class="form-control" required>
+
+        <button type="submit" style="margin-top:20px;" class="btn btn-primary btn-block">          
+            Ingresar
+        </button>
+    </form>
+</div>
+{% endblock %}

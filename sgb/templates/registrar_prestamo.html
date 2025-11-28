@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<article class="wrapper style1">
+  <div class="container">
+    <header style="text-align:center;">
+      <h1>📚 Solicitar Préstamo de Libro</h1>
+      <p>Selecciona un libro disponible para realizar el préstamo</p>
+    </header>
+
+    <!-- Mensajes de éxito o error -->
+    {% if messages %}
+      <div style="margin: 20px 0;">
+        {% for message in messages %}
+          <div style="padding: 15px; margin-bottom: 10px; border-radius: 5px; background-color: #ffffcc; border: 1px solid #ffcc00;">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Filtro de búsqueda -->
+    <div style="margin: 30px 0; text-align: center;">
+      <form method="GET" style="max-width: 500px; margin: 0 auto;">
+        <div style="display: flex; gap: 10px;">
+          <input type="text" name="buscar" placeholder="🔍 Buscar por título, autor o género..." 
+                 value="{{ busqueda }}" style="flex: 1; padding: 10px;">
+          <button type="submit" class="button">Buscar</button>
+          {% if busqueda %}
+            <a href="/prestamo/" class="button alt">Limpiar</a>
+          {% endif %}
+        </div>
+      </form>
+    </div>
+
+    {% if libros %}
+      <form method="POST" style="margin-top: 30px;">
+        {% csrf_token %}
+        
+        <div class="row">
+          <div class="col-12">
+            <label for="libro_id"><strong>Selecciona un libro:</strong></label>
+            <select name="libro_id" id="libro_id" required style="width: 100%; padding: 10px; margin-top: 10px;">
+              <option value="">-- Selecciona un libro --</option>
+              {% for libro in libros %}
+                <option value="{{ libro.id }}">{{ libro.titulo }} - {{ libro.autor }} ({{ libro.get_genero_display }})</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-12" style="margin-top: 20px;">
+            <label for="dias_prestamo"><strong>Días de préstamo:</strong></label>
+            <select name="dias_prestamo" id="dias_prestamo" required style="width: 100%; padding: 10px; margin-top: 10px;">
+              <option value="7">7 días</option>
+              <option value="14">14 días</option>
+              <option value="21">21 días</option>
+            </select>
+          </div>
+
+          <div class="col-12" style="margin-top: 30px; text-align: center;">
+            <button type="submit" class="button large">✅ Registrar Préstamo</button>
+            <a href="/dashboard/" class="button large alt">🔙 Volver</a>
+          </div>
+        </div>
+      </form>
+    {% else %}
+      <div style="text-align: center; margin: 40px 0;">
+        <p style="font-size: 1.2rem; color: #999;">
+          {% if busqueda %}
+            😔 No se encontraron libros con "{{ busqueda }}"
+          {% else %}
+            😔 No hay libros disponibles en este momento.
+          {% endif %}
+        </p>
+        <a href="/dashboard/" class="button">Volver al Dashboard</a>
+      </div>
+    {% endif %}
+
+  </div>
+</article>
+
+{% endblock %}

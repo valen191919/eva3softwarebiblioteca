@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<article class="wrapper style1">
+  <div class="container">
+    <header style="text-align:center;">
+      <h1>📊 Disponibilidad de Libros</h1>
+      <p>Consulta el estado de todos los libros en la biblioteca</p>
+    </header>
+
+    <!-- Filtro de búsqueda -->
+    <div style="margin: 30px 0; text-align: center;">
+      <form method="GET" style="max-width: 500px; margin: 0 auto;">
+        <div style="display: flex; gap: 10px;">
+          <input type="text" name="buscar" placeholder="🔍 Buscar por título, autor o género..." 
+                 value="{{ busqueda }}" style="flex: 1; padding: 10px;">
+          <button type="submit" class="button">Buscar</button>
+          {% if busqueda %}
+            <a href="/disponibilidad/" class="button alt">Limpiar</a>
+          {% endif %}
+        </div>
+      </form>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="row aln-center" style="margin-top: 30px; margin-bottom: 30px;">
+      <div class="col-4 col-12-small">
+        <div style="background-color: #e3f2fd; padding: 20px; border-radius: 10px; text-align: center;">
+          <h2 style="margin: 0; color: #1976d2;">{{ total_libros }}</h2>
+          <p style="margin: 5px 0 0 0; color: #555;">Total de Libros</p>
+        </div>
+      </div>
+      
+      <div class="col-4 col-12-small">
+        <div style="background-color: #e8f5e9; padding: 20px; border-radius: 10px; text-align: center;">
+          <h2 style="margin: 0; color: #388e3c;">{{ libros_disponibles }}</h2>
+          <p style="margin: 5px 0 0 0; color: #555;">✅ Disponibles</p>
+        </div>
+      </div>
+      
+      <div class="col-4 col-12-small">
+        <div style="background-color: #ffebee; padding: 20px; border-radius: 10px; text-align: center;">
+          <h2 style="margin: 0; color: #d32f2f;">{{ libros_prestados }}</h2>
+          <p style="margin: 5px 0 0 0; color: #555;">📚 Prestados</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de Libros -->
+    <div style="margin-top: 40px;">
+      <h3 style="text-align: center; margin-bottom: 20px;">Catálogo Completo</h3>
+      
+      {% if libros %}
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr style="background-color: #f5f5f5;">
+                <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Título</th>
+                <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Autor</th>
+                <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Género</th>
+                <th style="padding: 12px; text-align: center; border: 1px solid #ddd;">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for libro in libros %}
+                <tr>
+                  <td style="padding: 12px; border: 1px solid #ddd;">{{ libro.titulo }}</td>
+                  <td style="padding: 12px; border: 1px solid #ddd;">{{ libro.autor }}</td>
+                  <td style="padding: 12px; border: 1px solid #ddd;">{{ libro.get_genero_display }}</td>
+                  <td style="padding: 12px; text-align: center; border: 1px solid #ddd;">
+                    {% if libro.disponible %}
+                      <span style="color: green; font-weight: bold;">✅ Disponible</span>
+                    {% else %}
+                      <span style="color: red; font-weight: bold;">📚 Prestado</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p style="text-align: center; color: #999;">
+          {% if busqueda %}
+            No se encontraron libros con "{{ busqueda }}"
+          {% else %}
+            No hay libros registrados en el sistema.
+          {% endif %}
+        </p>
+      {% endif %}
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+      <a href="/dashboard/" class="button large">🔙 Volver al Dashboard</a>
+    </div>
+
+  </div>
+</article>
+
+{% endblock %}

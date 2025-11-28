@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+  .genre-bar { background-color: #e0e0e0; border-radius: 10px; height: 25px; overflow: hidden; }
+  .genre-bar-fill { background-color: #1976d2; height: 100%; width: 0; border-radius: 10px; transition: width 0.6s ease; }
+</style>
+
+<article class="wrapper style1">
+  <div class="container">
+    <header style="text-align:center;">
+      <h1>📈 Panel de Estadísticas</h1>
+      <p>Resumen del estado de la biblioteca</p>
+    </header>
+
+    <!-- Estadísticas principales -->
+    <div class="row aln-center" style="margin-top: 40px;">
+      
+      <div class="col-3 col-6-medium col-12-small">
+        <div style="background-color: #e3f2fd; padding: 25px; border-radius: 10px; text-align: center;">
+          <h2 style="margin: 0; color: #1976d2; font-size: 2.5rem;">{{ total_libros }}</h2>
+          <p style="margin: 10px 0 0 0; color: #555; font-weight: bold;">Total de Libros</p>
+        </div>
+      </div>
+
+      <div class="col-3 col-6-medium col-12-small">
+        <div style="background-color: #fff3e0; padding: 25px; border-radius: 10px; text-align: center;">
+          <h2 style="margin: 0; color: #f57c00; font-size: 2.5rem;">{{ prestamos_activos }}</h2>
+          <p style="margin: 10px 0 0 0; color: #555; font-weight: bold;">Préstamos Activos</p>
+        </div>
+      </div>
+
+      <div class="col-3 col-6-medium col-12-small">
+        <div style="background-color: #ffebee; padding: 25px; border-radius: 10px; text-align: center;">
+          <h2 style="margin: 0; color: #d32f2f; font-size: 2.5rem;">{{ prestamos_vencidos }}</h2>
+          <p style="margin: 10px 0 0 0; color: #555; font-weight: bold;">Préstamos Vencidos</p>
+        </div>
+      </div>
+
+      <div class="col-3 col-6-medium col-12-small">
+        <div style="background-color: #e8f5e9; padding: 25px; border-radius: 10px; text-align: center;">
+          <h2 style="margin: 0; color: #388e3c; font-size: 2.5rem;">{{ libros_por_genero|length }}</h2>
+          <p style="margin: 10px 0 0 0; color: #555; font-weight: bold;">Géneros Diferentes</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Distribución por género -->
+    <div style="margin-top: 50px;">
+      <h2 style="text-align: center; margin-bottom: 30px;">📚 Libros por Género</h2>
+      
+      {% if libros_por_genero %}
+        <div style="max-width: 600px; margin: 0 auto;">
+          {% for item in libros_por_genero %}
+            <div style="margin-bottom: 15px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                <span style="font-weight: bold;">{{ item.genero|title }}</span>
+                <span style="color: #666;">{{ item.total }} libro{% if item.total != 1 %}s{% endif %}</span>
+              </div>
+              <div class="genre-bar">
+                {% if total_libros > 0 %}
+                  {% widthratio item.total total_libros 100 as percent %}
+                  <div class="genre-bar-fill" data-percent="{{ percent }}"></div>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p style="text-align: center; color: #999;">No hay libros registrados</p>
+      {% endif %}
+    </div>
+
+    <div style="text-align: center; margin-top: 50px;">
+      <a href="/dashboard/" class="button large">🔙 Volver al Dashboard</a>
+    </div>
+
+  </div>
+</article>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.genre-bar-fill').forEach(function(el) {
+      var p = el.getAttribute('data-percent') || '0';
+      // ensure numeric
+      p = parseFloat(p) || 0;
+      el.style.width = p + '%';
+    });
+  });
+</script>
+
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<article class="wrapper style1">
+  <div class="container">
+    <header style="text-align:center;">
+      <h1>📝 Crear Cuenta</h1>
+      <p>Regístrate para acceder al sistema de préstamos</p>
+    </header>
+
+    <!-- Mensajes -->
+    {% if messages %}
+      <div style="margin: 20px 0;">
+        {% for message in messages %}
+          <div style="padding: 15px; margin-bottom: 10px; border-radius: 5px; background-color: #ffffcc; border: 1px solid #ffcc00;">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div style="max-width: 600px; margin: 30px auto;">
+      <form method="POST">
+        {% csrf_token %}
+        
+        <h3>Datos de Acceso</h3>
+        <div class="row gtr-uniform">
+          <div class="col-12">
+            <input type="text" name="username" placeholder="Nombre de usuario *" required>
+          </div>
+          <div class="col-6 col-12-xsmall">
+            <input type="password" name="password" placeholder="Contraseña *" required>
+          </div>
+          <div class="col-6 col-12-xsmall">
+            <input type="password" name="password2" placeholder="Confirmar contraseña *" required>
+          </div>
+        </div>
+
+        <h3 style="margin-top: 30px;">Datos Personales</h3>
+        <div class="row gtr-uniform">
+          <div class="col-6 col-12-xsmall">
+            <input type="text" name="first_name" placeholder="Nombre *" required>
+          </div>
+          <div class="col-6 col-12-xsmall">
+            <input type="text" name="last_name" placeholder="Apellido *" required>
+          </div>
+          <div class="col-12">
+            <input type="email" name="email" placeholder="Email *" required>
+          </div>
+          <div class="col-12">
+            <input type="text" name="rut" placeholder="RUT (12345678-9) *" required>
+          </div>
+          <div class="col-12">
+            <input type="text" name="direccion" placeholder="Dirección *" required>
+          </div>
+          <div class="col-12">
+            <input type="text" name="telefono" placeholder="Teléfono *" required>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+          <button type="submit" class="button large">✅ Crear Cuenta</button>
+          <a href="/" class="button large alt">🔙 Volver</a>
+        </div>
+
+        <p style="text-align: center; margin-top: 20px;">
+          ¿Ya tienes cuenta? <a href="/login/">Inicia sesión aquí</a>
+        </p>
+      </form>
+    </div>
+
+  </div>
+</article>
+
+{% endblock %}

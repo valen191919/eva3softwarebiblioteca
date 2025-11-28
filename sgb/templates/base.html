@@ -1,0 +1,50 @@
+{% load static %}
+
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Biblioteca MJV</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
+	</head>
+
+	<body class="is-preload">
+
+		<!-- NAV -->
+		<nav id="nav">
+			<ul class="container">
+				<li><a href="/">Inicio</a></li>
+			</ul>
+		</nav>
+
+		<!-- CONTENIDO DINÁMICO -->
+		{% block content %}
+		{% endblock %}
+
+		<!-- FOOTER BONITO -->
+		<footer id="footer" class="wrapper style4">
+			<div class="container medium">
+				<ul class="social">
+					<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+					<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+					<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+					<li><a href="#" class="icon brands fa-github"><span class="label">Github</span></a></li>
+				</ul>
+				<ul id="copyright">
+					<li>&copy; Biblioteca Comunitaria MJV. Todos los derechos reservados.</li>
+					<!--<li>Plantilla: <a href="https://html5up.net">HTML5 UP</a></li>-->
+				</ul>
+			</div>
+		</footer>
+
+		<!-- Scripts -->
+		<script src="{% static 'assets/js/jquery.min.js' %}"></script>
+		<script src="{% static 'assets/js/jquery.scrolly.min.js' %}"></script>
+		<script src="{% static 'assets/js/browser.min.js' %}"></script>
+		<script src="{% static 'assets/js/breakpoints.min.js' %}"></script>
+		<script src="{% static 'assets/js/util.js' %}"></script>
+		<script src="{% static 'assets/js/main.js' %}"></script>
+
+	</body>
+</html>
