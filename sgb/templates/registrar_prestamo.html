@@ -6,16 +6,16 @@
 <article class="wrapper style1">
   <div class="container">
     <header style="text-align:center;">
-      <h1>📚 Solicitar Préstamo de Libro</h1>
-      <p>Selecciona un libro disponible para realizar el préstamo</p>
+      <h1 style="color: #2c3e50; font-size: 2.2rem; font-weight: 700;">📚 Solicitar Préstamo de Libro</h1>
+      <p style="color: #7f8c8d; font-size: 1.15rem;">Selecciona un libro disponible para realizar el préstamo</p>
     </header>
 
     <!-- Mensajes de éxito o error -->
     {% if messages %}
       <div style="margin: 20px 0;">
         {% for message in messages %}
-          <div style="padding: 15px; margin-bottom: 10px; border-radius: 5px; background-color: #ffffcc; border: 1px solid #ffcc00;">
-            {{ message }}
+          <div style="padding: 18px; margin-bottom: 10px; border-radius: 8px; background-color: #fff9e6; border: 2px solid #f39c12; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <strong style="color: #2c3e50; font-size: 1.1rem;">{{ message }}</strong>
           </div>
         {% endfor %}
       </div>
@@ -36,27 +36,39 @@
     </div>
 
     {% if libros %}
+      <div style="background-color: #e8f5e9; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #27ae60;">
+        <p style="margin: 0; color: #27ae60; font-weight: 600; font-size: 1.05rem;">
+          ✅ {{ total_disponibles }} libro{{ total_disponibles|pluralize }} disponible{{ total_disponibles|pluralize }} para préstamo
+        </p>
+      </div>
+
       <form method="POST" style="margin-top: 30px;">
         {% csrf_token %}
         
         <div class="row">
           <div class="col-12">
-            <label for="libro_id"><strong>Selecciona un libro:</strong></label>
-            <select name="libro_id" id="libro_id" required style="width: 100%; padding: 10px; margin-top: 10px;">
+            <label for="libro_id" style="color: #2c3e50; font-weight: 700; font-size: 1.1rem;">Selecciona un libro:</label>
+            <select name="libro_id" id="libro_id" required style="width: 100%; padding: 12px; margin-top: 10px; font-size: 1.05rem; color: #2c3e50; border: 2px solid #bdc3c7; border-radius: 5px;">
               <option value="">-- Selecciona un libro --</option>
               {% for libro in libros %}
                 <option value="{{ libro.id }}">{{ libro.titulo }} - {{ libro.autor }} ({{ libro.get_genero_display }})</option>
               {% endfor %}
             </select>
+            <p style="margin-top: 8px; color: #7f8c8d; font-size: 0.95rem;">
+              ℹ️ Solo se muestran libros que están disponibles para préstamo
+            </p>
           </div>
 
           <div class="col-12" style="margin-top: 20px;">
-            <label for="dias_prestamo"><strong>Días de préstamo:</strong></label>
-            <select name="dias_prestamo" id="dias_prestamo" required style="width: 100%; padding: 10px; margin-top: 10px;">
+            <label for="dias_prestamo" style="color: #2c3e50; font-weight: 700; font-size: 1.1rem;">Días de préstamo:</label>
+            <select name="dias_prestamo" id="dias_prestamo" required style="width: 100%; padding: 12px; margin-top: 10px; font-size: 1.05rem; color: #2c3e50; border: 2px solid #bdc3c7; border-radius: 5px;">
               <option value="7">7 días</option>
               <option value="14">14 días</option>
               <option value="21">21 días</option>
             </select>
+            <p style="margin-top: 8px; color: #7f8c8d; font-size: 0.95rem;">
+              ⚠️ Recuerda: $1,000 de multa por cada día de atraso
+            </p>
           </div>
 
           <div class="col-12" style="margin-top: 30px; text-align: center;">
@@ -66,13 +78,17 @@
         </div>
       </form>
     {% else %}
-      <div style="text-align: center; margin: 40px 0;">
-        <p style="font-size: 1.2rem; color: #999;">
+      <div style="text-align: center; margin: 40px 0; background-color: #fff9e6; padding: 30px; border-radius: 10px; border: 2px solid #f39c12;">
+        <div style="font-size: 4rem; margin-bottom: 15px;">📭</div>
+        <h3 style="color: #2c3e50; margin-bottom: 10px;">
           {% if busqueda %}
-            😔 No se encontraron libros con "{{ busqueda }}"
+            No se encontraron libros disponibles con "{{ busqueda }}"
           {% else %}
-            😔 No hay libros disponibles en este momento.
+            No hay libros disponibles en este momento
           {% endif %}
+        </h3>
+        <p style="color: #7f8c8d; font-size: 1.1rem; margin-bottom: 20px;">
+          Todos los libros están prestados actualmente. Por favor, intenta más tarde.
         </p>
         <a href="/dashboard/" class="button">Volver al Dashboard</a>
       </div>

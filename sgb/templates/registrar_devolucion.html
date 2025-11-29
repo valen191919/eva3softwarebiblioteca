@@ -6,16 +6,16 @@
 <article class="wrapper style1">
   <div class="container">
     <header style="text-align:center;">
-      <h1>📖 Devolver Libro</h1>
-      <p>Registra la devolución de tus libros prestados</p>
+      <h1 style="color: #2c3e50; font-size: 2.2rem; font-weight: 700;">📖 Devolver Libro</h1>
+      <p style="color: #7f8c8d; font-size: 1.15rem;">Registra la devolución de tus libros prestados</p>
     </header>
 
     <!-- Mensajes de éxito o error -->
     {% if messages %}
       <div style="margin: 20px 0;">
         {% for message in messages %}
-        <div style="padding: 15px; margin-bottom: 10px; border-radius: 5px; background-color: #ffffcc; border: 1px solid #ffcc00;">
-            {{ message }}
+          <div style="padding: 18px; margin-bottom: 10px; border-radius: 8px; background-color: #fff9e6; border: 2px solid #f39c12; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <strong style="color: #2c3e50; font-size: 1.1rem;">{{ message }}</strong>
           </div>
         {% endfor %}
       </div>
@@ -23,20 +23,19 @@
 
     {% if prestamos %}
       <div style="margin-top: 30px;">
-        <h3 style="text-align: center; margin-bottom: 20px;">Tus Préstamos Activos</h3>
+        <h3 style="text-align: center; margin-bottom: 20px; color: #2c3e50; font-size: 1.6rem; font-weight: 700;">Tus Préstamos Activos</h3>
         
         {% for prestamo in prestamos %}
-          <div style="border: 2px solid #ddd; padding: 20px; margin-bottom: 20px; border-radius: 10px; background-color: #f9f9f9;">
-            <h4>📚 {{ prestamo.libro.titulo }}</h4>
-            <p><strong>Autor:</strong> {{ prestamo.libro.autor }}</p>
-            <p><strong>Fecha de Préstamo:</strong> {{ prestamo.fecha_prestamo|date:"d/m/Y" }}</p>
-            <p><strong>Fecha de Devolución Esperada:</strong> {{ prestamo.fecha_devolucion_esperada|date:"d/m/Y" }}</p>
+          <div style="border: 3px solid #3498db; padding: 25px; margin-bottom: 20px; border-radius: 10px; background-color: #f8f9fa; box-shadow: 0 3px 10px rgba(0,0,0,0.1);">
+            <h4 style="color: #2c3e50; font-size: 1.4rem; font-weight: 700; margin-bottom: 10px;">📚 {{ prestamo.libro.titulo }}</h4>
+            <p style="color: #34495e; font-size: 1.1rem; margin: 8px 0;"><strong>Autor:</strong> {{ prestamo.libro.autor }}</p>
+            <p style="color: #34495e; font-size: 1.1rem; margin: 8px 0;"><strong>Fecha de Préstamo:</strong> {{ prestamo.fecha_prestamo|date:"d/m/Y" }}</p>
+            <p style="color: #34495e; font-size: 1.1rem; margin: 8px 0;"><strong>Fecha de Devolución Esperada:</strong> {{ prestamo.fecha_devolucion_esperada|date:"d/m/Y" }}</p>
 
-
-            <form method="POST" style="margin-top: 15px;">
+            <form method="POST" style="margin-top: 20px;">
               {% csrf_token %}
               <input type="hidden" name="prestamo_id" value="{{ prestamo.id }}">
-              <button type="submit" class="button">🔄 Devolver este Libro</button>
+              <button type="submit" class="button" style="font-size: 1.1rem; padding: 12px 24px; font-weight: 600;">🔄 Devolver este Libro</button>
             </form>
           </div>
         {% endfor %}

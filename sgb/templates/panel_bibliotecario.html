@@ -72,8 +72,7 @@
       {% else %}
         <p style="text-align: center; color: #999;">No hay libros registrados</p>
       {% endif %}
-    </div>
-
+      </div>
     <div style="text-align: center; margin-top: 50px;">
       <a href="/dashboard/" class="button large">🔙 Volver al Dashboard</a>
     </div>
@@ -81,15 +80,14 @@
   </div>
 </article>
 
+{% endblock %}
+
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.genre-bar-fill').forEach(function(el) {
       var p = el.getAttribute('data-percent') || '0';
-      // ensure numeric
       p = parseFloat(p) || 0;
       el.style.width = p + '%';
     });
   });
 </script>
-
-{% endblock %}

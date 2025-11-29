@@ -15,7 +15,7 @@ def home(request):
 def dashboard(request):
     """
     Dashboard principal del sistema - Se adapta según el rol del usuario
-    Muestra nombre del usuario y opciones según su rol
+    Muestra nombre del usuario, opciones según su rol y préstamos activos del usuario
     """
     # Obtener el perfil del usuario
     perfil = None
@@ -25,14 +25,29 @@ def dashboard(request):
     # Estadísticas generales
     total_libros = Libro.objects.count()
     libros_disponibles = Libro.objects.filter(disponible=True).count()
-    prestamos_activos = Prestamo.objects.filter(fecha_devolucion_real__isnull=True).count()
+    prestamos_activos_totales = Prestamo.objects.filter(fecha_devolucion_real__isnull=True).count()
+    
+    # Préstamos activos del usuario actual (para lectores)
+    mis_prestamos = Prestamo.objects.filter(
+        usuario=request.user,
+        fecha_devolucion_real__isnull=True
+    ).select_related('libro').order_by('fecha_devolucion_esperada')
+    
+    # Calcular días restantes para cada préstamo
+    fecha_actual = timezone.now().date()
+    for prestamo in mis_prestamos:
+        dias_restantes = (prestamo.fecha_devolucion_esperada - fecha_actual).days
+        prestamo.dias_restantes = dias_restantes
+        prestamo.esta_vencido = dias_restantes < 0
+        prestamo.dias_restantes_abs = abs(dias_restantes)
     
     context = {
         'usuario': request.user,
         'perfil': perfil,
         'total_libros': total_libros,
         'libros_disponibles': libros_disponibles,
-        'prestamos_activos': prestamos_activos,
+        'prestamos_activos': prestamos_activos_totales,
+        'mis_prestamos': mis_prestamos,
     }
     return render(request, 'dashboard.html', context)
 
@@ -40,25 +55,50 @@ def dashboard(request):
 def registrar_prestamo(request):
     """
     Funcionalidad 1: Registro de Préstamo con filtro de búsqueda
-    - Muestra libros disponibles
-    - Permite solicitar un préstamo
+    - Muestra SOLO libros disponibles
+    - Valida que el libro esté disponible antes de prestar
     - Cambia el estado del libro a "Prestado"
     """
     if request.method == 'POST':
         libro_id = request.POST.get('libro_id')
         dias_prestamo = int(request.POST.get('dias_prestamo', 7))
         
-        # Validación de seguridad: verificar que el libro existe y está disponible
+        # VALIDACIÓN 1: Verificar que el libro existe
         try:
-            libro = Libro.objects.get(id=libro_id, disponible=True)
+            libro = Libro.objects.get(id=libro_id)
         except Libro.DoesNotExist:
-            messages.error(request, '❌ El libro seleccionado no está disponible.')
+            messages.error(request, '❌ El libro seleccionado no existe.')
             return redirect('registrar_prestamo')
         
-        # Calcular fecha de devolución esperada
+        # VALIDACIÓN 2: Verificar que el libro está disponible
+        if not libro.disponible:
+            messages.error(request, f'❌ Lo sentimos, el libro "{libro.titulo}" ya está prestado y no está disponible en este momento.')
+            return redirect('registrar_prestamo')
+        
+        # VALIDACIÓN 3: Verificar que no hay préstamos activos de este libro
+        prestamo_activo = Prestamo.objects.filter(
+            libro=libro,
+            fecha_devolucion_real__isnull=True
+        ).exists()
+        
+        if prestamo_activo:
+            messages.error(request, f'❌ El libro "{libro.titulo}" tiene un préstamo activo. No se puede prestar hasta que sea devuelto.')
+            return redirect('registrar_prestamo')
+        
+        # VALIDACIÓN 4: Verificar que el usuario no tiene este libro prestado
+        usuario_tiene_libro = Prestamo.objects.filter(
+            usuario=request.user,
+            libro=libro,
+            fecha_devolucion_real__isnull=True
+        ).exists()
+        
+        if usuario_tiene_libro:
+            messages.error(request, f'❌ Ya tienes el libro "{libro.titulo}" en préstamo. Debes devolverlo antes de solicitarlo nuevamente.')
+            return redirect('registrar_prestamo')
+        
+        # Todas las validaciones pasaron: Crear el préstamo
         fecha_devolucion_esperada = timezone.now().date() + timedelta(days=dias_prestamo)
         
-        # Crear el préstamo
         Prestamo.objects.create(
             usuario=request.user,
             libro=libro,
@@ -69,13 +109,23 @@ def registrar_prestamo(request):
         libro.disponible = False
         libro.save()
         
-        messages.success(request, f'✅ Préstamo registrado exitosamente. Debes devolver antes del {fecha_devolucion_esperada.strftime("%d/%m/%Y")}')
+        messages.success(request, f'✅ Préstamo registrado exitosamente. Libro: "{libro.titulo}". Debes devolver antes del {fecha_devolucion_esperada.strftime("%d/%m/%Y")}')
         return redirect('dashboard')
     
-    # Filtro de búsqueda
+    # Mostrar SOLO libros disponibles
     busqueda = request.GET.get('buscar', '')
+    
+    # Filtro base: Solo libros con disponible=True Y sin préstamos activos
     libros_disponibles = Libro.objects.filter(disponible=True)
     
+    # Excluir libros con préstamos activos (doble validación)
+    libros_con_prestamos_activos = Prestamo.objects.filter(
+        fecha_devolucion_real__isnull=True
+    ).values_list('libro_id', flat=True)
+    
+    libros_disponibles = libros_disponibles.exclude(id__in=libros_con_prestamos_activos)
+    
+    # Aplicar búsqueda si existe
     if busqueda:
         libros_disponibles = libros_disponibles.filter(
             Q(titulo__icontains=busqueda) |
@@ -83,9 +133,13 @@ def registrar_prestamo(request):
             Q(genero__icontains=busqueda)
         )
     
+    # Contar total de libros disponibles
+    total_disponibles = libros_disponibles.count()
+    
     context = {
         'libros': libros_disponibles,
-        'busqueda': busqueda
+        'busqueda': busqueda,
+        'total_disponibles': total_disponibles,
     }
     return render(request, 'registrar_prestamo.html', context)
 

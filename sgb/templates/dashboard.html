@@ -3,78 +3,116 @@
 
 {% block content %}
 
+<style>
+  .loan-card { background-color: white; padding: 20px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+  .loan-card.danger { border: 2px solid #e74c3c; }
+  .loan-card.warning { border: 2px solid #f39c12; }
+  .loan-card.ok { border: 2px solid #2ecc71; }
+
+  .status-box { text-align: center; padding: 15px; border-radius: 8px; min-width: 150px; }
+  .status-box.danger { background-color: #ffebee; }
+  .status-box.warning { background-color: #fff9e6; }
+  .status-box.ok { background-color: #e8f5e9; }
+</style>
+
 <article class="wrapper style1">
   <div class="container">
-    
-    <!-- Barra superior con nombre y logout -->
-    <div style="background-color: #f5f5f5; padding: 15px; border-radius: 10px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-      <div style="margin-bottom: 10px;">
-        <strong>👤 Bienvenido/a:</strong> 
-        {{ usuario.get_full_name|default:usuario.username }}
-        {% if perfil %}
-          <span style="color: #666; font-size: 0.9em;">({{ perfil.get_rol_display }})</span>
-        {% endif %}
-      </div>
-      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-        <!-- Botón de Admin solo para administradores -->
-        {% if usuario.is_superuser or usuario.is_staff %}
-          <a href="/admin/" class="button small" target="_blank">⚙️ Panel Admin Django</a>
-        {% endif %}
-        <a href="/logout/" class="button small">🚪 Cerrar Sesión</a>
-      </div>
-    </div>
 
     <!-- Estadísticas rápidas -->
     <div class="row aln-center" style="margin-bottom: 30px;">
       <div class="col-4 col-12-small">
-        <div style="background-color: #e3f2fd; padding: 15px; border-radius: 10px; text-align: center;">
-          <h3 style="margin: 0; color: #1976d2;">{{ total_libros }}</h3>
-          <p style="margin: 5px 0 0 0; color: #555;">Total Libros</p>
+        <div style="background-color: #e3f2fd; padding: 20px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+          <h2 style="margin: 0; color: #1976d2; font-size: 2.5rem;">{{ total_libros }}</h2>
+          <p style="margin: 10px 0 0 0; color: #1976d2; font-weight: 600; font-size: 1.1rem;">Total Libros</p>
         </div>
       </div>
       <div class="col-4 col-12-small">
-        <div style="background-color: #e8f5e9; padding: 15px; border-radius: 10px; text-align: center;">
-          <h3 style="margin: 0; color: #388e3c;">{{ libros_disponibles }}</h3>
-          <p style="margin: 5px 0 0 0; color: #555;">Disponibles</p>
+        <div style="background-color: #e8f5e9; padding: 20px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+          <h2 style="margin: 0; color: #388e3c; font-size: 2.5rem;">{{ libros_disponibles }}</h2>
+          <p style="margin: 10px 0 0 0; color: #388e3c; font-weight: 600; font-size: 1.1rem;">Disponibles</p>
         </div>
       </div>
       <div class="col-4 col-12-small">
-        <div style="background-color: #fff3e0; padding: 15px; border-radius: 10px; text-align: center;">
-          <h3 style="margin: 0; color: #f57c00;">{{ prestamos_activos }}</h3>
-          <p style="margin: 5px 0 0 0; color: #555;">Préstamos Activos</p>
+        <div style="background-color: #fff3e0; padding: 20px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+          <h2 style="margin: 0; color: #f57c00; font-size: 2.5rem;">{{ prestamos_activos }}</h2>
+          <p style="margin: 10px 0 0 0; color: #f57c00; font-weight: 600; font-size: 1.1rem;">Préstamos Activos</p>
         </div>
       </div>
     </div>
 
+    <!-- MIS PRÉSTAMOS ACTIVOS (Para Lectores) -->
+    {% if mis_prestamos %}
+      <div style="background-color: #fff9e6; border-left: 5px solid #f39c12; padding: 25px; margin-bottom: 40px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <h2 style="margin: 0 0 20px 0; color: #2c3e50; font-size: 1.8rem;">📚 Mis Libros Prestados</h2>
+        
+        {% for prestamo in mis_prestamos %}
+          <div class="loan-card {% if prestamo.esta_vencido %}danger{% elif prestamo.dias_restantes <= 2 %}warning{% else %}ok{% endif %}">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+              <div style="flex: 1; min-width: 250px;">
+                <h3 style="margin: 0 0 10px 0; color: #2c3e50; font-size: 1.4rem;">{{ prestamo.libro.titulo }}</h3>
+                <p style="margin: 5px 0; color: #7f8c8d; font-size: 1.05rem;"><strong>Autor:</strong> {{ prestamo.libro.autor }}</p>
+                <p style="margin: 5px 0; color: #7f8c8d; font-size: 1.05rem;"><strong>Fecha de préstamo:</strong> {{ prestamo.fecha_prestamo|date:"d/m/Y" }}</p>
+                <p style="margin: 5px 0; color: #7f8c8d; font-size: 1.05rem;"><strong>Fecha límite:</strong> {{ prestamo.fecha_devolucion_esperada|date:"d/m/Y" }}</p>
+              </div>
+              
+              <div class="status-box {% if prestamo.esta_vencido %}danger{% elif prestamo.dias_restantes <= 2 %}warning{% else %}ok{% endif %}">
+                {% if prestamo.esta_vencido %}
+                  <div style="font-size: 3rem; margin-bottom: 5px;">⚠️</div>
+                  <p style="margin: 0; font-weight: bold; color: #e74c3c; font-size: 1.3rem;">VENCIDO</p>
+                  <p style="margin: 5px 0 0 0; color: #c0392b; font-size: 1.1rem;">Hace {{ prestamo.dias_restantes_abs }} día{{ prestamo.dias_restantes_abs|pluralize }}</p>
+                  <p style="margin: 5px 0 0 0; color: #e74c3c; font-size: 0.95rem; font-weight: 600;">Multa: ${{ prestamo.dias_restantes_abs }}000</p>
+                {% elif prestamo.dias_restantes == 0 %}
+                  <div style="font-size: 3rem; margin-bottom: 5px;">⏰</div>
+                  <p style="margin: 0; font-weight: bold; color: #f39c12; font-size: 1.3rem;">¡HOY VENCE!</p>
+                {% elif prestamo.dias_restantes <= 2 %}
+                  <div style="font-size: 3rem; margin-bottom: 5px;">⏳</div>
+                  <p style="margin: 0; font-weight: bold; color: #f39c12; font-size: 1.3rem;">Quedan {{ prestamo.dias_restantes }} día{{ prestamo.dias_restantes|pluralize }}</p>
+                  <p style="margin: 5px 0 0 0; color: #e67e22; font-size: 0.95rem;">¡Devolver pronto!</p>
+                {% else %}
+                  <div style="font-size: 3rem; margin-bottom: 5px;">✅</div>
+                  <p style="margin: 0; font-weight: bold; color: #27ae60; font-size: 1.3rem;">{{ prestamo.dias_restantes }} día{{ prestamo.dias_restantes|pluralize }}</p>
+                  <p style="margin: 5px 0 0 0; color: #229954; font-size: 0.95rem;">restantes</p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+
+        <div style="text-align: center; margin-top: 20px;">
+          <a href="/devolucion/" class="button large" style="font-size: 1.1rem; padding: 14px 28px;">📖 Devolver un Libro</a>
+        </div>
+      </div>
+    {% endif %}
+
     <header>
-      <h1 style="text-align:center;">¿Qué acción deseas realizar?</h1>
-      <p style="text-align:center;">Selecciona uno de los procesos disponibles del sistema.</p>
+      <h1 style="text-align:center; color: #2c3e50; font-size: 2rem;">¿Qué acción deseas realizar?</h1>
+      <p style="text-align:center; color: #7f8c8d; font-size: 1.15rem;">Selecciona uno de los procesos disponibles del sistema</p>
     </header>
 
     <!-- Opciones para TODOS los usuarios -->
     <div class="row aln-center" style="margin-top:40px;">
 
       <div class="col-4 col-6-medium col-12-small">
-        <section class="box style1">
-          <h3>📚 Solicitar un libro</h3>
-          <p>Ver libros disponibles y realizar un préstamo.</p>
-          <a href="/prestamo/" class="button">Ir</a>
+        <section class="box style1" style="box-shadow: 0 3px 10px rgba(0,0,0,0.1);">
+          <h3 style="color: #2c3e50; font-size: 1.3rem;">📚 Solicitar un libro</h3>
+          <p style="color: #7f8c8d; font-size: 1.05rem;">Ver libros disponibles y realizar un préstamo.</p>
+          <a href="/prestamo/" class="button" style="font-size: 1.05rem;">Ir</a>
         </section>
       </div>
 
       <div class="col-4 col-6-medium col-12-small">
-        <section class="box style1">
-          <h3>📖 Devolver un libro</h3>
-          <p>Registrar la devolución de un libro y ver multas si corresponde.</p>
-          <a href="/devolucion/" class="button">Ir</a>
+        <section class="box style1" style="box-shadow: 0 3px 10px rgba(0,0,0,0.1);">
+          <h3 style="color: #2c3e50; font-size: 1.3rem;">📖 Devolver un libro</h3>
+          <p style="color: #7f8c8d; font-size: 1.05rem;">Registrar la devolución de un libro y ver multas si corresponde.</p>
+          <a href="/devolucion/" class="button" style="font-size: 1.05rem;">Ir</a>
         </section>
       </div>
 
       <div class="col-4 col-6-medium col-12-small">
-        <section class="box style1">
-          <h3>📊 Disponibilidad de libros</h3>
-          <p>Revisar si existe disponibilidad de libros.</p>
-          <a href="/disponibilidad/" class="button">Ir</a>
+        <section class="box style1" style="box-shadow: 0 3px 10px rgba(0,0,0,0.1);">
+          <h3 style="color: #2c3e50; font-size: 1.3rem;">📊 Disponibilidad de libros</h3>
+          <p style="color: #7f8c8d; font-size: 1.05rem;">Revisar si existe disponibilidad de libros.</p>
+          <a href="/disponibilidad/" class="button" style="font-size: 1.05rem;">Ir</a>
         </section>
       </div>
 
@@ -82,25 +120,25 @@
 
     <!-- Opciones SOLO para Bibliotecarios y Administradores -->
     {% if perfil and perfil.rol in 'bibliotecario,administrador' %}
-      <div style="margin-top: 50px; padding-top: 30px; border-top: 2px solid #ddd;">
-        <h2 style="text-align: center; color: #1976d2;">🔧 Panel de Gestión</h2>
-        <p style="text-align: center; color: #666;">Herramientas exclusivas para bibliotecarios</p>
+      <div style="margin-top: 50px; padding-top: 30px; border-top: 3px solid #3498db;">
+        <h2 style="text-align: center; color: #2c3e50; font-size: 1.8rem;">🔧 Panel de Gestión</h2>
+        <p style="text-align: center; color: #7f8c8d; font-size: 1.1rem;">Herramientas exclusivas para bibliotecarios</p>
         
         <div class="row aln-center" style="margin-top: 30px;">
           
-          <div class="col-4 col-6-medium col-12-small">
-            <section class="box style1" style="border: 2px solid #1976d2;">
-              <h3>📚 Gestionar Libros</h3>
-              <p>Agregar, editar y eliminar libros del catálogo.</p>
-              <a href="/gestionar-libros/" class="button">Ir</a>
+          <div class="col-6 col-12-medium">
+            <section class="box style1" style="border: 3px solid #3498db; box-shadow: 0 3px 10px rgba(0,0,0,0.15);">
+              <h3 style="color: #2c3e50; font-size: 1.3rem;">📚 Gestionar Libros</h3>
+              <p style="color: #7f8c8d; font-size: 1.05rem;">Agregar, editar y eliminar libros del catálogo.</p>
+              <a href="/gestionar-libros/" class="button" style="font-size: 1.05rem;">Ir</a>
             </section>
           </div>
 
-          <div class="col-4 col-6-medium col-12-small">
-            <section class="box style1" style="border: 2px solid #1976d2;">
-              <h3>📈 Ver Estadísticas</h3>
-              <p>Consultar estadísticas detalladas del sistema.</p>
-              <a href="/panel-bibliotecario/" class="button">Ir</a>
+          <div class="col-6 col-12-medium">
+            <section class="box style1" style="border: 3px solid #3498db; box-shadow: 0 3px 10px rgba(0,0,0,0.15);">
+              <h3 style="color: #2c3e50; font-size: 1.3rem;">📈 Ver Estadísticas</h3>
+              <p style="color: #7f8c8d; font-size: 1.05rem;">Consultar estadísticas detalladas del sistema.</p>
+              <a href="/panel-bibliotecario/" class="button" style="font-size: 1.05rem;">Ir</a>
             </section>
           </div>
 
